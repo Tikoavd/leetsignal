@@ -1,21 +1,43 @@
-//uncomplete, wrong answer on 44th case
-import java.util.Hashtable;
+//passed 48/52 cases...
+import java.util.*;
 class Solution {
     public boolean canFinish(int numCourses, int[][] prerequisites) {
         if(prerequisites.length == 0) return true;
-        Hashtable<Integer, Integer> table = new Hashtable<Integer, Integer>();
-        for(int i = 0; i < prerequisites.length; i++) {
-            table.put(prerequisites[i][1], prerequisites[i][0]);
+        
+        Hashtable<Integer, ArrayList<Integer>> table = 
+            new Hashtable<Integer, ArrayList<Integer>>();
+        
+        for (int[] prerequisite : prerequisites) {
+            if (!table.containsKey(prerequisite[1])) {
+                ArrayList<Integer> l = new ArrayList<Integer>();
+                l.add(prerequisite[0]);
+                table.put(prerequisite[1], l);
+            } else table.get(prerequisite[1]).add(prerequisite[0]);
         }
-        int i = 0;
-        while(i < prerequisites.length && !(table.containsKey(prerequisites[i][0]) &&
-              table.get(prerequisites[i][0]) == prerequisites[i][1] ||
-                table.get(prerequisites[i][0]) != null
-            && table.containsKey(table.get(prerequisites[i][0])))) {
-            i++;
-            System.out.print(i + " ");
+        
+        int count = 0;
+        
+        for (int[] prerequisite : prerequisites){
+            if(noCycle(table, prerequisite[0], prerequisite[1])) count++;
         }
-        if(i == prerequisites.length) return true;
-        return ++i >= numCourses;        
+        
+        if(count == prerequisites.length) return true;
+        return count >= numCourses;        
+    }
+    
+    public static boolean noCycle(Hashtable<Integer, ArrayList<Integer>> table, Integer Value, Integer Key){
+        if(!table.containsKey(Value)) return true;
+        else if(table.get(Value).contains(Key)) return false;
+        else return noCycle(table, table.get(Value), Value, 0);
+    }
+    public static boolean noCycle(Hashtable<Integer, ArrayList<Integer>> table, ArrayList<Integer> Values, Integer Key,int counts){
+        if(counts > table.size()) return false;
+        counts++;
+        for (Integer n : Values){
+            if(!table.containsKey(n)) return true;
+            else if(table.get(n).contains(Key)) return false;
+            else return noCycle(table, table.get(n), n, counts);
+        }
+        return true;
     }
 }
