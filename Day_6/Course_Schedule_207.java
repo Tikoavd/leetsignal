@@ -16,12 +16,21 @@ class Solution {
         }
         
         int count = 0;
+        int steps = 0;
+        HashSet<Integer> visited = new HashSet<Integer>();
         
         for (int[] prerequisite : prerequisites){
-            if(noCycle(table, prerequisite[0], prerequisite[1])) count++;
+            if(visited.contains(prerequisite[0])) {
+                steps++;
+                continue;
+            }
+            else visited.add(prerequisite[0]);
+            if(noCycle(table, prerequisite[0], prerequisite[1])) {
+                count++;
+            }
         }
         
-        if(count == prerequisites.length) return true;
+        if(steps + count == prerequisites.length) return true;
         return count >= numCourses;        
     }
     
